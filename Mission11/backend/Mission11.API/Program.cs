@@ -22,8 +22,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors(x => x.WithOrigins("http://localhost:3030/"));
-app.UseHttpsRedirection();
+app.UseCors(x => x.WithOrigins("http://localhost:3030").AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthorization();
 

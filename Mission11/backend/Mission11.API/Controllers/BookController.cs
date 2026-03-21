@@ -15,8 +15,26 @@ public class BookController : Controller
     }
     
     [HttpGet("AllBooks")]
-    public IEnumerable<Book> GetProjects() // Enumerable list of books
+    public IActionResult GetProjects(int pageHowMany = 5, int pageNum = 1, bool sortTitleAsc = true)
     {
-        return _dbContext.Books.ToList();
+        // Build a sorted query first; Skip/Take must run after OrderBy for correct paging.
+        IQueryable<Book> ordered = sortTitleAsc
+            ? _dbContext.Books.OrderBy(b => b.Title)
+            : _dbContext.Books.OrderByDescending(b => b.Title);
+
+        var pageOfBooks = ordered
+            .Skip((pageNum - 1) * pageHowMany)
+            .Take(pageHowMany)
+            .ToList();
+
+        var totalNumBooks = _dbContext.Books.Count();
+
+        var someObject = new
+        {
+            Books = pageOfBooks,
+            TotalNumBooks = totalNumBooks
+        };
+
+        return Ok(someObject);
     }
 }
